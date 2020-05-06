@@ -52,7 +52,8 @@ namespace Alghoritms.Tests
         public void TotalCheck(int index, String folder, ISolution task, String[] inputData, String[] expectedResult)
         {
             String[] actual = task.Run(inputData);
-            CollectionAssert.AreEqual(expectedResult, actual, $"\nInput Data: {String.Join('\n', inputData)}\nExpected:   {String.Join('\n', expectedResult)}\nActual:     {String.Join('\n', actual)}\n");
+            bool isMultiLine = expectedResult.Length > 1;
+            CollectionAssert.AreEqual(expectedResult, actual, $"\nInput Data: {String.Join('\n', inputData)}\nExpected:   {(isMultiLine ? "\n" : String.Empty)}{String.Join('\n', expectedResult)}\nActual:     {(isMultiLine ? "\n" : String.Empty)}{String.Join('\n', actual)}\n");
         }
 
         /// <summary>
@@ -81,10 +82,13 @@ namespace Alghoritms.Tests
             string baseFolderName = rootTestFolder;
             var solutions = typeof(ISolution).Assembly.GetExportedTypes()
                 .Where(t => typeof(ISolution).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract
-                && t.GetCustomAttribute<SolutionDescriptionAttribute>() != null)
-                .Select(t => new { Task = Activator.CreateInstance(t) as ISolution, Attribute = t.GetCustomAttribute<SolutionDescriptionAttribute>() })
+                    && t.GetCustomAttribute<SolutionDescriptionAttribute>() != null)
+                .Select(t => new { 
+                    Task = Activator.CreateInstance(t) as ISolution, 
+                    Attribute = t.GetCustomAttribute<SolutionDescriptionAttribute>() })
                 .Where(x => x.Attribute != null)
-                .OrderBy(x => x.Attribute.Subfolder);
+                .OrderBy(x => x.Attribute.Subfolder)
+                .ToArray();
             bool currentOnly = solutions.Any(t => t.Attribute.Actual);
             var solutionsForTest = solutions.Where(s => !currentOnly || s.Attribute.Actual);
             foreach (var test in solutionsForTest)
@@ -105,6 +109,10 @@ namespace Alghoritms.Tests
                         yield return new object[] { index, test.Attribute.Subfolder, test.Task, inputData, expectedResult };
                         index++;
                     } while (!singleTest);
+                }
+                else
+                {
+                    throw new Exception($"Sub-folder '{test.Attribute.Subfolder}' was not fount");
                 }
             }
         }
