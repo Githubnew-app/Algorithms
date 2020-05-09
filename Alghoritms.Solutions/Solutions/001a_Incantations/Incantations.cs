@@ -11,7 +11,7 @@ namespace Alghoritms.Solutions
         public string[] Run(string[] input) => Incantation(Int32.Parse(input[0]));
 
         private const int SIZE = 25;
-        private Dictionary<int, Func<int, int, bool>> KnownIncantations = new Dictionary<int, Func<int, int, bool>>
+        private readonly Dictionary<int, Func<int, int, bool>> KnownIncantations = new Dictionary<int, Func<int, int, bool>>
         {
             [00] = (x, y) => x > y,
             [01] = (x, y) => x == y,
