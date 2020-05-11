@@ -11,7 +11,7 @@ namespace Alghoritms.Solutions.Common
     /// <item>To specify <c>Certain</c> number of test case to launch. (Optional)</item>
     /// </list>
     /// /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class SolutionDescriptionAttribute : Attribute
     {
         /// <summary>
