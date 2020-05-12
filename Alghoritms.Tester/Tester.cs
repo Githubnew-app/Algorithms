@@ -49,11 +49,21 @@ namespace Alghoritms.Tests
         /// <param name="expectedResult">Expected result</param>
         [DataTestMethod]
         [DynamicData(nameof(GetData), DynamicDataSourceType.Method, DynamicDataDisplayName = "DisplayName")]
-        public void TotalCheck(int index, String folder, ISolution task, String[] inputData, String[] expectedResult)
+        public void TotalCheck(int _0, String _1, ISolution task, String[] inputData, String[] expectedResult)
         {
             String[] actual = task.Run(inputData);
+            if ("<No data>".Equals(expectedResult[0]))
+            {
+                String path = Path.Combine(rootTestFolder, _1);
+                File.WriteAllLines(Path.Combine(path, $"test.{_0}.out"), actual);
+            }
+            CollectionAssert.AreEqual(expectedResult, actual, BuildErrorMessage(inputData, expectedResult, actual));
+        }
+
+        private static string BuildErrorMessage(string[] inputData, string[] expectedResult, string[] actual)
+        {
             bool isMultiLine = expectedResult.Length > 1;
-            CollectionAssert.AreEqual(expectedResult, actual, $"\nInput Data: {String.Join('\n', inputData)}\nExpected:   {(isMultiLine ? "\n" : String.Empty)}{String.Join('\n', expectedResult)}\nActual:     {(isMultiLine ? "\n" : String.Empty)}{String.Join('\n', actual)}\n");
+            return $"\nInput Data: {String.Join((isMultiLine ? '\n' : ';'), inputData)}\nExpected:   {(isMultiLine ? "\n" : String.Empty)}{String.Join(('\n'), expectedResult)}\nActual:     {(isMultiLine ? "\n" : String.Empty)}{String.Join('\n', actual)}\n";
         }
 
         /// <summary>
@@ -62,15 +72,20 @@ namespace Alghoritms.Tests
         /// <param name="methodInfo">Meta information about called method</param>
         /// <param name="data">Set of data to perform test</param>
         /// <returns></returns>
-        public static string DisplayName(MethodInfo methodInfo, Object[] data)
+        public static string DisplayName(MethodInfo _, Object[] data)
         {
-            String shortPresentationOfTestData = ((String[])data[3])[0] ?? String.Empty;
-            shortPresentationOfTestData = $"{new String(shortPresentationOfTestData.Take(10).ToArray())}{(shortPresentationOfTestData.Length >= 10 ? "..." : String.Empty)}";
+            const int limit = 20;
+            var actualValue = (String[])data[3/*Actual value*/];
+            String shortPresentationOfTestData = actualValue.Length > 0
+                ? String.Join(';', actualValue)
+                : String.Empty;
+            shortPresentationOfTestData = $"{new String(shortPresentationOfTestData.Take(limit).ToArray())}{(shortPresentationOfTestData.Length >= limit ? "..." : String.Empty)}";
 
-            String shortPresentationOfExpectedResult = ((String[])data[4])[0] ?? String.Empty;
-            shortPresentationOfExpectedResult = $"{new String(shortPresentationOfExpectedResult.Take(10).ToArray())}{(shortPresentationOfExpectedResult.Length >= 10 ? "..." : String.Empty)}";
+            var expectedValue = (String[])data[4/*Expected value*/];
+            String shortPresentationOfExpectedResult = expectedValue.Length > 0 ? expectedValue[0] : String.Empty;
+            shortPresentationOfExpectedResult = $"{new String(shortPresentationOfExpectedResult.Take(limit).ToArray())}{(shortPresentationOfExpectedResult.Length >= limit ? "..." : String.Empty)}";
 
-            return $"{(String)data[1]}. Test #{data[0]} ({shortPresentationOfTestData}/{shortPresentationOfExpectedResult})";
+            return $"{(String)data[1]}. Test #{data[0/*Task number*/]} ({shortPresentationOfTestData}/{shortPresentationOfExpectedResult})";
         }
 
         /// <summary>
@@ -82,10 +97,10 @@ namespace Alghoritms.Tests
             string baseFolderName = rootTestFolder;
             var solutions = typeof(ISolution).Assembly.GetExportedTypes()
                 .Where(t => typeof(ISolution).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract
-                    && t.GetCustomAttribute<SolutionDescriptionAttribute>() != null)
-                .Select(t => new { 
+                    && t.GetCustomAttributes<SolutionDescriptionAttribute>().Any())
+                .SelectMany(t => t.GetCustomAttributes<SolutionDescriptionAttribute>(), (t, a) => new { 
                     Task = Activator.CreateInstance(t) as ISolution, 
-                    Attribute = t.GetCustomAttribute<SolutionDescriptionAttribute>() })
+                    Attribute = a })
                 .Where(x => x.Attribute != null)
                 .OrderBy(x => x.Attribute.Subfolder)
                 .ToArray();
@@ -101,11 +116,13 @@ namespace Alghoritms.Tests
                     do
                     {
                         String filePathIn = Path.Combine(path, $"test.{index}.in");
-                        String filePathOut = Path.Combine(path, $"test.{index}.out");
-                        if (!File.Exists(filePathIn) || !File.Exists(filePathOut))
+                        if (!File.Exists(filePathIn))
                             break;
+                        String filePathOut = Path.Combine(path, $"test.{index}.out");
                         String[] inputData = File.ReadAllLines(filePathIn);
-                        String[] expectedResult = File.ReadAllLines(filePathOut);
+                        String[] expectedResult = File.Exists(filePathOut)
+                            ? File.ReadAllLines(filePathOut)
+                            : new String[] { "<No data>" };
                         yield return new object[] { index, test.Attribute.Subfolder, test.Task, inputData, expectedResult };
                         index++;
                     } while (!singleTest);

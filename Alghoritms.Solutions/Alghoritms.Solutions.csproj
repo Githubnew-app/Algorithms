@@ -8,5 +8,4 @@
   <ItemGroup>
     <Folder Include="Solutions\002_Tickets\" />
   </ItemGroup>
-
 </Project>
