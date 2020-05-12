@@ -9,3 +9,7 @@ ___
 
 - Incantations *(for fun)*
   - To figure out what incantation (a single line function F(x, y)) should lead to an expected image.
+
+- Winning tickets
+  - To find amount of winning ticket among N*2 digits numbers.
+
