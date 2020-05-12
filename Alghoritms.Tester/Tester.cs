@@ -52,11 +52,13 @@ namespace Alghoritms.Tests
         public void TotalCheck(int _0, String _1, ISolution task, String[] inputData, String[] expectedResult)
         {
             String[] actual = task.Run(inputData);
+            /*Generation of missed output files
             if ("<No data>".Equals(expectedResult[0]))
             {
                 String path = Path.Combine(rootTestFolder, _1);
                 File.WriteAllLines(Path.Combine(path, $"test.{_0}.out"), actual);
             }
+            */
             CollectionAssert.AreEqual(expectedResult, actual, BuildErrorMessage(inputData, expectedResult, actual));
         }
 
