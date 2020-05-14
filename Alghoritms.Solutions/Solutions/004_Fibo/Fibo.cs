@@ -49,14 +49,14 @@ namespace Alghoritms.Solutions.Solutions
                 t1 = m1;
                 t2 = m2;
                 m2 = m2 * m2 + m1 * m1;
-                m1 = m1 * t2 + m0 * m1;
+                m1 *= (t2 + m0);
                 m0 = t1 * t1 + m0 * m0;
                 if (((n >>= 1) & 1) == 1)
                 {
                     t1 = r1;
                     t2 = r2;
-                    r2 = m2 * r2 + m1 * r1;
-                    r1 = m1 * t2 + m0 * r1;
+                    r2 = m2 * t2 + m1 * t1;
+                    r1 = m1 * t2 + m0 * t1;
                     r0 = m1 * t1 + m0 * r0;
                 }
             }
