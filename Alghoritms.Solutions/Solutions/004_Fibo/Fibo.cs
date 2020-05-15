@@ -16,7 +16,7 @@ namespace Alghoritms.Solutions.Solutions
         private BigInteger Recursion(ulong n)
             => (n <= 1) ? n : (Recursion(n - 1) + Recursion(n - 2));
 
-        private BigInteger Iterations(ulong n)
+        public BigInteger Iterations(ulong n)
         {
             if (n <= 1) return n;
             BigInteger result = 1, previous = 1, tmp, max = n;
@@ -29,8 +29,7 @@ namespace Alghoritms.Solutions.Solutions
             return result;
         }
 
-
-        private BigInteger GoldenRatio(ulong n)
+        public BigInteger GoldenRatio(ulong n)
         {
             double sqrt5 = Math.Sqrt(5);
             double phi = (1 + sqrt5) / 2.0;
@@ -42,24 +41,23 @@ namespace Alghoritms.Solutions.Solutions
         {
             if (n <= 1) return n;
             BigInteger m0 = 0, m1 = 1, m2 = 1;
-            BigInteger r0 = 0, r2 = 1, t2, t1;
+            BigInteger r2 = 1, t2, t1;
             BigInteger r1 = ((n & 1) == 1) ? 1 : 0;
-            for (; n > 0;)
+            do
             {
-                t1 = m1;
+                t1 = m1 * m1;
                 t2 = m2;
-                m2 = m2 * m2 + m1 * m1;
-                m1 = m1 * t2 + m0 * m1;
-                m0 = t1 * t1 + m0 * m0;
+                m1 *= t2 + m0;
+                m2 = t2 * t2 + t1;
+                m0 = t1 + m0 * m0;
                 if (((n >>= 1) & 1) == 1)
                 {
                     t1 = r1;
                     t2 = r2;
-                    r2 = m2 * r2 + m1 * r1;
-                    r1 = m1 * t2 + m0 * r1;
-                    r0 = m1 * t1 + m0 * r0;
+                    r2 = m2 * t2 + m1 * t1;
+                    r1 = m1 * t2 + m0 * t1;
                 }
-            }
+            } while (n > 1);
             return r1;
         }
     }
