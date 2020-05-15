@@ -13,29 +13,29 @@ namespace Alghoritms.Solutions.Solutions
             return FenToBitboard(fen).Select(v => v.ToString()).ToArray();
         }
 
-        static readonly char[] Figures = new[] { 'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k' };
+        static readonly char[] Pieces = new[] { 'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k' };
 
         public ulong[] FenToBitboard(String fen)
         {
             ulong[] bitboard = new ulong[12];
-            int index = 0, row = 0, pos = 7, len = fen.Length;
+            int index = 0, row = 0, position = 7, length = fen.Length;
             do
             {
-                char symb = fen[index];
-                switch (symb)
+                char symbol = fen[index];
+                switch (symbol)
                 {
                     case '/': /*New row*/
                         row += 8;
-                        pos = 7;
+                        position = 7;
                         break;
                     case char s when s < 57: /*Digit*/
-                        pos -= symb - 48;
+                        position -= symbol - 48;
                         break;
                     default:
-                        bitboard[Array.IndexOf(Figures, symb)] |= 0x8000000000000000UL >> (row + pos--);
+                        bitboard[Array.IndexOf(Pieces, symbol)] |= 0x8000000000000000UL >> (row + position--);
                         break;
                 }
-            } while (++index < len);
+            } while (++index < length);
             return bitboard;
         }
     }
