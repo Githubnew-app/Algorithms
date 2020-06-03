@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
-namespace Alghoritms.Solutions.Solutions._007_DynamicArrays
+namespace Alghoritms.Solutions.Solutions
 {
-    public class SingleArray<T> : IList<T>
+    public class SingleArray<T> : ISimpleList<T>
     {
         private T[] data;
         public SingleArray()
@@ -14,9 +12,22 @@ namespace Alghoritms.Solutions.Solutions._007_DynamicArrays
 
         public int Count => data.Length;
 
-        public bool IsReadOnly => false;
+        public T this[int index]
+        {
+            get
+            {
+                if (index >= Count)
+                    throw new IndexOutOfRangeException();
+                return data[index];
+            }
 
-        public T this[int index] { get => data[index]; set => data[index] = value; }
+            set
+            {
+                if (index >= Count)
+                    throw new IndexOutOfRangeException();
+                data[index] = value;
+            }
+        }
 
         public void Add(T item)
         {
@@ -46,36 +57,6 @@ namespace Alghoritms.Solutions.Solutions._007_DynamicArrays
         public void Clear()
         {
             data = new T[0];
-        }
-
-        public bool Contains(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int IndexOf(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Remove(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
         }
     }
 }
